@@ -1,0 +1,22 @@
+data3.2<- data.frame(x1 <- c(25,20,6,1001,525,825,120,28,7,532,75,40,187,122,74),
+                      x2 <- c(3547.79,896.34,750.32,2087.05,1639.31,3357.7,808.47,520.27,671.13,2863.32,1160,862.75,672.99,901.76,3546.18),
+                      y <- c(553.96,208.55,3.1,2815.4,1052.12,3427,442.82,70.12,122.24,1400,464,7.5,224.18,538.94,2442.79)
+                     )
+lm.eco <- lm(y~x1+x2,data3.2);lm.eco
+summary(lm.eco)#得出残差的标准差估计为 475.8
+yy <- fitted(lm.eco);yy#拟合模型预测值
+options(digits=1)#指定小数点后有效数，保留一位小数
+ei <- y-yy;ei #residuals(lm.eco)#拟合模型 普通残差值ei                  
+a <- rep(1,15)
+X <- cbind(a,x1,x2);X                   #构造设计矩阵
+H <- X%*%solve(t(X)%*%X)%*%t(X);H       #计算帽子矩阵
+hii <- diag(H) ;hii                     #求杠杆值
+options(digits=2)
+SRE <- (ei/(475.8*sqrt(1-hii)));SRE     #学生化残差      
+DRE <- ei/(1-hii);DRE                   #删除残差
+options(digits=2)
+SDR <- SRE*sqrt((15-2-2)/(15-2-1-SRE^2));SDR   #得到删除的学生化残差
+options(digits=2)
+ch_ii <- hii-1/15;ch_ii                  #中心化杠杆值ch_ii
+Di <- (hii*ei^2)/((2+1)*475.8^2*(1-hii)^2);Di  #计算库克距离
+data <- data.frame(x1,x2,y,ei = ei,SRE = SRE,e_i =DRE ,SREi = SDR,ch_ii = ch_ii,Di = Di) ;data #得到表4-8
